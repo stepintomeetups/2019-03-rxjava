@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="rxjava-2.2.7">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/rxjava-2.2.7.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libs/docs/rxjava-2.2.7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/sources/rxjava-2.2.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
