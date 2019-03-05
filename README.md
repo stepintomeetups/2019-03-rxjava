@@ -7,7 +7,7 @@
 ---
 
 ## Topics
-- **Observer design pattern, Iterator design pattern, streams, Java `Future`s and `CompletableFuture`s** 
+- **Observer design pattern, Iterator design pattern/streams, Java `Future`s and `CompletableFuture`s** 
 - **Reactive programming and RxJava**
 - **Let's code!**
 - **Reactive programming vs functional reactive programming vs reactive systems**
@@ -20,7 +20,9 @@ JShell snippets were developed and tested with the following toolchain,
 however in theory everything should work fine with any JDK 10+ 
 (or JDK 9+ if you replace `var` keywords with the proper types)
 
-### JDK (Oracle JDK)
+## Tested with
+
+### JDK 11 (Oracle JDK)
 ```cmd
 java version "11.0.2" 2018-10-16 LTS
 Java(TM) SE Runtime Environment 18.9 (build 11.0.2+7-LTS)
