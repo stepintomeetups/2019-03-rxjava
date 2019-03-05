@@ -1,7 +1,7 @@
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
         return Observable.fromIterable(delays);
     }
 
-    public Observable<Double> temperatures() {
+    public Observable<Double> temperaturesFromFirstSensor() {
         return Observable.fromArray(20.23, 20.21, 20.14, 20.09, 20.14);
     }
 
@@ -50,12 +50,11 @@ import java.util.concurrent.TimeUnit;
     }
 
     public Observable<Double> fastEmitter() {
-        return temperatureGenerator(temperatures(), 1, TimeUnit.NANOSECONDS);
+        return temperatureGenerator(temperaturesFromFirstSensor(), 1, TimeUnit.NANOSECONDS);
     }
 
     public Observable<Double> sensor1() {
-        Flowable.just(1).subscribe();
-        return temperatureGenerator(temperatures(), 1, TimeUnit.SECONDS);
+        return temperatureGenerator(temperaturesFromFirstSensor(), 1, TimeUnit.SECONDS);
     }
 
     public Observable<Double> sensor2() {
@@ -72,6 +71,30 @@ import java.util.concurrent.TimeUnit;
 
     public Observable<Double> someDouble() {
         return Observable.fromCallable(() -> ThreadLocalRandom.current().nextDouble());
+    }
+
+    public Observable<Double> switchingBetweenSchedulers() {
+        return Observable.just(1.1).
+                doOnNext(item -> System.out.println("Producing on " + Thread.currentThread().getName())).
+                subscribeOn(Schedulers.newThread()).
+                observeOn(Schedulers.computation()).
+                map(item -> item * 2).
+                doOnNext(item -> System.out.println("Processing on " + Thread.currentThread().getName())).
+                observeOn(Schedulers.io());
+    }
+
+    public void multicast() {
+        var shared = sensor1().share();
+
+        shared.observeOn(Schedulers.io()).
+                subscribe(item -> System.out.println("Writing to audit log: " + item));
+        shared.map(elem -> round(elem)).
+                distinctUntilChanged().
+                subscribe(item -> System.out.println("Temperature changed: " + item));
+
+        shared.timeout(500, TimeUnit.MILLISECONDS).
+                retry(3).subscribe(elem -> {
+        }, error -> System.out.println("Sensor is down!"));
     }
 
     public Double compute(final Double temperature) {
@@ -105,8 +128,9 @@ import java.util.concurrent.TimeUnit;
 
         @Override
         public void onError(final Throwable throwable) {
-            System.out.println("Finished with error on thread " + Thread.currentThread().getName() +
-                    " @ " + LocalTime.now() + " with exception" + throwable.getStackTrace());
+            System.err.println("Finished with error on thread " + Thread.currentThread().getName() +
+                    " @ " + LocalTime.now() + " with the following exception.");
+            throwable.printStackTrace();
         }
 
         @Override
@@ -130,9 +154,9 @@ import java.util.concurrent.TimeUnit;
 
         @Override
         public void onError(final Throwable throwable) {
-            System.out.println("Finished with error on thread " + Thread.currentThread().getName() +
-                    " @ " + LocalTime.now() + " with exception" + throwable.getStackTrace());
-
+            System.err.println("Finished with error on thread " + Thread.currentThread().getName() +
+                    " @ " + LocalTime.now() + " with the following exception.");
+            throwable.printStackTrace();
         }
 
         @Override
