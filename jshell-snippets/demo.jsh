@@ -102,7 +102,11 @@ import java.util.concurrent.TimeUnit;
 
     //different elements for each observer
     public Observable<Double> doubles() {
-        return Observable.defer(() -> Observable.just(1.1, 2.2, 3.3));
+        return Observable.defer(() -> {
+            return Observable.just(ThreadLocalRandom.current().nextDouble(),
+                    ThreadLocalRandom.current().nextDouble(),
+                    ThreadLocalRandom.current().nextDouble());
+        });
     }
 
     //schedulers
@@ -115,7 +119,6 @@ import java.util.concurrent.TimeUnit;
                 doOnNext(item -> System.out.println("Processing on " + Thread.currentThread().getName())).
                 observeOn(Schedulers.io());
     }
-
 
     //cold vs hot Observables, multicasting
     public void multicast() {
